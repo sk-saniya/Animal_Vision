@@ -28,7 +28,7 @@ LABEL_MAP_OUT  = BASE_DIR / "label_map.json"
 EMBED_CACHE    = BASE_DIR / "text_embeddings_cache.pt"
 
 BATCH_SIZE  = 32
-EPOCHS      = 5
+EPOCHS      = 20
 LR          = 1e-3
 VAL_SPLIT   = 0.15
 SEED        = 42
