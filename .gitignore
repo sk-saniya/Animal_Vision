@@ -1,0 +1,91 @@
+# -------------------------------------------------
+# General / OS‑specific files
+# -------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# -------------------------------------------------
+# Python / Backend
+# -------------------------------------------------
+# Byte‑compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.env/
+ENV/
+.env.*          # any .env.* files (e.g., .env.local)
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# Jupyter / IPython
+.ipynb_checkpoints/
+
+# Logs & temporary files
+*.log
+*.tmp
+*.cache
+
+# Data / model artefacts (you can adjust if you want to keep some)
+*.csv
+*.tsv
+*.json
+*.txt
+*.dat
+*.pt
+*.pth
+*.h5
+*.ckpt
+# Ignore the image dataset
+Backend/Animal/
+
+
+# -------------------------------------------------
+# Frontend / Node / Next.js
+# -------------------------------------------------
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+pnpm-lock.yaml
+pnpm-debug.log
+
+# Environment files
+.env.local
+.env.production
+.env.development
+
+# -------------------------------------------------
+# IDE / Editor specific
+# -------------------------------------------------
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+
+# -------------------------------------------------
+# Miscellaneous
+# -------------------------------------------------
+*.bak
+*.orig
+*.old
+
+!Backend/animals_data.txt
+!Backend/cnn_model.pth
+!Backend/label_map.json
+!Backend/text_embeddings_cache.pt
+!Backend/requirements.txt
