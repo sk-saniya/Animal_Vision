@@ -11,7 +11,7 @@ export const config = {
   api: { bodyParser: false },   // must be off for file uploads
 };
 
-const FLASK_URL = process.env.FLASK_URL || "http://localhost:5000";
+const FLASK_URL = process.env.FLASK_URL || "http://localhost:7860";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
