@@ -1,5 +1,4 @@
-// pages/api/health.js
-// Simple proxy to check if the Flask backend is online
+
 
 const FLASK_URL = process.env.FLASK_URL || "http://localhost:7860";
 
