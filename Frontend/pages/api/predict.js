@@ -1,6 +1,4 @@
-// pages/api/predict.js
-// Proxies multipart/form-data from Next.js to the Flask backend.
-// Requires: npm install form-data node-fetch@2
+
 
 import formidable from "formidable";
 import FormData from "form-data";
