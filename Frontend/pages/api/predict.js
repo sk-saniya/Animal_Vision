@@ -9,7 +9,7 @@ export const config = {
   api: { bodyParser: false },   // must be off for file uploads
 };
 
-const FLASK_URL = process.env.FLASK_URL || "http://localhost:7860";
+const BACKEND_URL = process.env.BACKEND_URL || process.env.FLASK_URL || "http://localhost:7860";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -36,16 +36,25 @@ export default async function handler(req, res) {
   formData.append("top_k", top_k);
 
   try {
-    const response = await fetch(`${FLASK_URL}/predict`, {
+    const response = await fetch(`${BACKEND_URL}/predict`, {
       method: "POST",
       body: formData,
       headers: formData.getHeaders(),
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      data = { error: responseText || "Prediction server returned an invalid response." };
+    }
+
     return res.status(response.status).json(data);
   } catch (err) {
-    console.error("Flask proxy error:", err.message);
-    return res.status(502).json({ error: "Could not reach prediction server. Make sure clip_api.py is running." });
+    console.error("Prediction proxy error:", err);
+    return res.status(502).json({
+      error: "Could not reach prediction server. Make sure the backend is running and BACKEND_URL is correct.",
+    });
   }
 }
