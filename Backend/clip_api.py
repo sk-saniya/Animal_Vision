@@ -1,4 +1,6 @@
+
 import io
+import os
 import re
 from pathlib import Path
 from typing import List, Tuple
@@ -213,36 +215,7 @@ def health():
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    """
-    POST /predict
-    Request  : multipart/form-data  { image: <file> }
-
-    Response (animal image):
-        200 { "predicted_animal": "Snow Leopard", "accuracy": 87.35 }
-
-    Response (non-animal image):
-        400 { "error": "Not an animal image",
-              "detail": "Image appears to contain 'car', not an animal.",
-              "animal_score": 12.3 }
-
-    Frontend fetch example:
-    ───────────────────────
-    const form = new FormData();
-    form.append("image", file);
-    const res  = await fetch("http://localhost:5000/predict", {
-        method: "POST", body: form
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-        // non-animal image
-        console.log(data.error);   // "Not an animal image"
-        console.log(data.detail);  // "Image appears to contain 'car' …"
-    } else {
-        console.log(data.predicted_animal);  // "Snow Leopard"
-        console.log(data.accuracy);          // 87.35
-    }
-    """
+ 
     if "image" not in request.files:
         return jsonify({"error": "No image file provided"}), 400
 
@@ -286,7 +259,8 @@ def predict():
 # RUN
 # ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 7860))
     print("\n[clip_api] Endpoints:")
-    print("  GET  http://localhost:5000/health")
-    print("  POST http://localhost:5000/predict\n")
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    print(f"  GET  http://localhost:{port}/health")
+    print(f"  POST http://localhost:{port}/predict\n")
+    app.run(host="0.0.0.0", port=port, debug=False)
