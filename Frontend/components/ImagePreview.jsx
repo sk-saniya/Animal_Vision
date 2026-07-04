@@ -1,7 +1,17 @@
 // components/ImagePreview.jsx
 import { useState, useEffect } from "react";
 
-export default function ImagePreview({ file, previewUrl, topK, setTopK, onPredict, onClear, loading, onFileSelect }) {
+export default function ImagePreview({
+  file,
+  previewUrl,
+  topK,
+  setTopK,
+  onPredict,
+  onClear,
+  loading,
+  onFileSelect,
+  hideImage = false,
+}) {
   if (!file) return null;
 
   const sizeKB = (file.size / 1024).toFixed(1);
@@ -20,7 +30,7 @@ export default function ImagePreview({ file, previewUrl, topK, setTopK, onPredic
   }, [previewUrl]);
 
   return (
-    <div className="preview-card">
+    <div className={`preview-card ${hideImage ? "preview-card--compact" : ""}`}>
       <div className="preview-header">
         <h3>Selected Image</h3>
         <div className="preview-actions">
@@ -46,9 +56,11 @@ export default function ImagePreview({ file, previewUrl, topK, setTopK, onPredic
       </div>
 
       <div className="preview-body">
-        <div className="preview-img-wrap">
-          <img src={previewUrl} alt="Selected animal" />
-        </div>
+        {!hideImage && (
+          <div className="preview-img-wrap">
+            <img src={previewUrl} alt="Selected animal" />
+          </div>
+        )}
 
         <div className="preview-info">
           <div className="file-meta">
