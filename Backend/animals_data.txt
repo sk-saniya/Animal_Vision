@@ -25000,3 +25000,38 @@
 25000. Iridescent Hornbill
 25001. Black Jaguar
 25002. Persian Cat
+25003. German Shepherd
+25004. Labrador Retriever
+25005. Golden Retriever
+25006. Poodle
+25007. Beagle
+25008. Bulldog
+25009. Siberian Husky
+25010. Rottweiler
+25011. Chihuahua
+25012. Dachshund
+25013. Boxer
+25014. Doberman Pinscher
+25015. Great Dane
+25016. Shih Tzu
+25017. Border Collie
+25018. Australian Shepherd
+25019. Pomeranian
+25020. Yorkshire Terrier
+25021. Cocker Spaniel
+25022. Basset Hound
+25023. Bernese Mountain Dog
+25024. Saint Bernard
+25025. Shetland Sheepdog
+25026. Cavalier King Charles Spaniel
+25027. Pug
+25028. French Bulldog
+25029. Akita
+25030. Alaskan Malamute
+25031. Bloodhound
+25032. Weimaraner
+25033. Newfoundland
+25034. Bull Terrier
+25035. Papillon
+25036. Samoyed
+25037. Vizsla
