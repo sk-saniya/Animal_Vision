@@ -1272,6 +1272,15 @@ p {
   color: var(--accent);
 }
 
+.error-detail {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--text-2);
+  opacity: 0.9;
+  word-break: break-word;
+}
+
 @media (max-width: 600px) {
   .footer-inner {
     flex-direction: column;

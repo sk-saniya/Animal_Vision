@@ -45,6 +45,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [errorDetail, setErrorDetail] = useState(null);
   const [backendOnline, setBackendOnline] = useState(null);
   const [modelInfo, setModelInfo] = useState(null);
 
@@ -68,6 +69,7 @@ export default function Home() {
     setPreviewUrl(URL.createObjectURL(selectedFile));
     setResult(null);
     setError(null);
+    setErrorDetail(null);
   }, []);
 
   function handleClear() {
@@ -75,12 +77,14 @@ export default function Home() {
     setPreviewUrl(null);
     setResult(null);
     setError(null);
+    setErrorDetail(null);
   }
 
   async function handlePredict() {
     if (!file) return;
     setLoading(true);
     setError(null);
+    setErrorDetail(null);
     setResult(null);
 
     const formData = new FormData();
@@ -92,16 +96,31 @@ export default function Home() {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw { response: { data } };
+        const message = data?.error || data?.detail || "Prediction failed";
+        const detailParts = [
+          `HTTP ${res.status}`,
+          data?.detail ? `detail: ${data.detail}` : null,
+          data?.error ? `error: ${data.error}` : null,
+          data?.animal_score !== undefined ? `animal_score: ${data.animal_score}` : null,
+        ].filter(Boolean);
+
+        throw {
+          response: {
+            status: res.status,
+            data,
+          },
+          message,
+          detail: detailParts.join(" | "),
+        };
       }
 
       setResult(data);
     } catch (err) {
       const responseData = err.response?.data;
-      const msg = responseData?.error || "Something went wrong while predicting. Please try again.";
+      const msg = err.message || responseData?.error || "Something went wrong while predicting. Please try again.";
 
       if (msg.toLowerCase().includes("not an animal")) {
         setResult({
@@ -111,6 +130,7 @@ export default function Home() {
         });
       } else {
         setError(msg);
+        setErrorDetail(err.detail || responseData?.detail || null);
       }
     } finally {
       setLoading(false);
@@ -192,6 +212,7 @@ export default function Home() {
                   <div>
                     <div className="error-title">Prediction failed</div>
                     <div className="error-msg">{error}</div>
+                    {errorDetail && <div className="error-detail">{errorDetail}</div>}
                   </div>
                 </div>
               )}
