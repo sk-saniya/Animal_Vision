@@ -72,10 +72,15 @@ export default function Home() {
 
   const handleFileSelect = useCallback((selectedFile) => {
     setFile(selectedFile);
-    setPreviewUrl(URL.createObjectURL(selectedFile));
     setResult(null);
     setError(null);
     setErrorDetail(null);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPreviewUrl(reader.result);
+    };
+    reader.readAsDataURL(selectedFile);
   }, []);
 
   function handleClear() {
