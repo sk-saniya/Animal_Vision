@@ -1,4 +1,4 @@
 {
-  "installCommand": "cd Frontend && npm install",
-  "buildCommand": "cd Frontend && npm run build"
+  "installCommand": "if [ -f package.json ]; then npm install; else cd Frontend && npm install; fi",
+  "buildCommand": "if [ -f package.json ]; then npm run build; else cd Frontend && npm run build; fi"
 }
