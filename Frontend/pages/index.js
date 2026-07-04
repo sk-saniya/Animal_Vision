@@ -1,7 +1,5 @@
-// pages/index.js
 import { useState, useEffect, useCallback } from "react";
 import Head from "next/head";
-import axios from "axios";
 import UploadZone from "../components/UploadZone";
 import ImagePreview from "../components/ImagePreview";
 import PredictionResult from "../components/PredictionResult";
@@ -50,17 +48,15 @@ export default function Home() {
   const [backendOnline, setBackendOnline] = useState(null);
   const [modelInfo, setModelInfo] = useState(null);
 
-  // Check backend health on load
   useEffect(() => {
-    axios
-      .get("/api/health")
-      .then((res) => {
-        setBackendOnline(res.data.online);
-        if (res.data.online) {
+    fetch("/api/health")
+      .then((res) => res.json())
+      .then((data) => {
+        setBackendOnline(data.online);
+        if (data.online) {
           setModelInfo({
-            model: res.data.model_name,
-            labels: res.data.total_labels,
-            device: res.data.device,
+            labels: data.animals_loaded,
+            device: data.device,
           });
         }
       })
@@ -92,16 +88,27 @@ export default function Home() {
     formData.append("top_k", topK);
 
     try {
-      const res = await axios.post("/api/predict", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const res = await fetch("/api/predict", {
+        method: "POST",
+        body: formData,
       });
-      setResult(res.data);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw { response: { data } };
+      }
+
+      setResult(data);
     } catch (err) {
       const responseData = err.response?.data;
       const msg = responseData?.error || "Something went wrong while predicting. Please try again.";
-      // Show non-animal response inside the result box instead of the error card
-      if (msg && msg.toLowerCase().includes("not an animal")) {
-        setResult({ notAnimal: true, message: msg });
+
+      if (msg.toLowerCase().includes("not an animal")) {
+        setResult({
+          notAnimal: true,
+          message: responseData?.detail || msg,
+          animalScore: responseData?.animal_score,
+        });
       } else {
         setError(msg);
       }
@@ -126,7 +133,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Header */}
       <header className="header">
         <div className="container header-inner">
           <div className="header-logo">
@@ -146,9 +152,7 @@ export default function Home() {
         </div>
       </header>
 
-
       <main className="container" style={{ flex: 1, paddingBottom: "3rem" }}>
-        {/* Hero */}
         <div className="hero">
           <h2 className="hero-subtitle">ANIMAL VISION</h2>
           <h1 className="hero-title">Identify Any Animal From A Single Photo</h1>
@@ -158,7 +162,6 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Upload or Preview */}
         {!file ? (
           <UploadZone onFileSelect={handleFileSelect} />
         ) : (
@@ -177,15 +180,12 @@ export default function Home() {
             </div>
 
             <div className="side-right">
-              {/* Loading state */}
               {loading && (
                 <div className="loading-card">
                   <div className="spinner"></div>
-
                 </div>
               )}
 
-              {/* Error state */}
               {error && !loading && (
                 <div className="error-card">
                   <i className="ti ti-alert-triangle error-icon" aria-hidden="true" style={{ color: "var(--danger)" }}></i>
@@ -196,7 +196,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Results */}
               {result && !loading && (
                 <PredictionResult result={result} imageSrc={previewUrl} onReset={handleClear} />
               )}
@@ -204,7 +203,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Stats row - shown only on initial empty state */}
         {!file && !result && (
           <div className="stats-row">
             <div className="stat-card">
@@ -223,10 +221,9 @@ export default function Home() {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="container footer-inner">
-          <p>Made with <span className="heart">❤️</span> for animal vision. © {new Date().getFullYear()} Animal Vision. All rights reserved.</p>
+          <p>Made with <span className="heart">❤</span> for animal vision. © {new Date().getFullYear()} Animal Vision. All rights reserved.</p>
         </div>
       </footer>
     </div>
