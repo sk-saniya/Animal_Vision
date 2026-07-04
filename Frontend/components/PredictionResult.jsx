@@ -16,9 +16,16 @@ export default function PredictionResult({ result, imageSrc, onReset }) {
   const predictions = Array.isArray(result.predictions) ? result.predictions : [];
   const top = predictions[0];
   const maxConf = predictions[0]?.confidence || 1;
+  const safeFileName = result.file_name || result.filename || null;
 
   return (
     <div className="results-card">
+      {imageSrc && (
+        <div className="results-image-wrap">
+          <img src={imageSrc} alt="Prediction preview" className="results-image" />
+        </div>
+      )}
+
       {/* Header */}
       <div className="results-header">
         <h2>Prediction Results</h2>
@@ -34,6 +41,11 @@ export default function PredictionResult({ result, imageSrc, onReset }) {
         <div className="prediction-box">
           <div className="prediction-box-label">Predicted Animal</div>
           <div className="prediction-box-name">{predictedAnimal}</div>
+          {safeFileName && (
+            <div className="prediction-box-accuracy" style={{ marginTop: "0.4rem" }}>
+              File: <strong>{safeFileName}</strong>
+            </div>
+          )}
           <div className="prediction-box-accuracy">
             Accuracy: <strong>{accuracy !== null ? `${accuracy.toFixed(2)}%` : "—"}</strong>
           </div>

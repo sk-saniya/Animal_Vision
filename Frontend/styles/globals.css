@@ -1272,6 +1272,23 @@ p {
   color: var(--accent);
 }
 
+.results-image-wrap {
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(79, 142, 247, 0.12);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+}
+
+.results-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: cover;
+}
+
 .error-detail {
   margin-top: 0.35rem;
   font-size: 0.82rem;
