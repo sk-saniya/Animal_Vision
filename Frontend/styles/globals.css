@@ -1249,6 +1249,14 @@ p {
   text-align: center;
 }
 
+.heart {
+  display: inline-block;
+  color: #ef4444;
+  animation: heartPulse 0.85s ease-in-out infinite;
+  transform-origin: center;
+  text-shadow: 0 0 6px rgba(239, 68, 68, 0.45), 0 0 14px rgba(239, 68, 68, 0.25);
+}
+
 .footer-links {
   display: flex;
   gap: 1.5rem;
@@ -1279,5 +1287,16 @@ p {
 
   100% {
     background-position: 0% 0%, 100% 50%;
+  }
+}
+
+@keyframes heartPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25) translateY(-1px);
+    opacity: 0.9;
   }
 }
