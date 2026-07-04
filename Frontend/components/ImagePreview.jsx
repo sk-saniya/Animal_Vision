@@ -77,7 +77,7 @@ export default function ImagePreview({
             </div>
             <div className="meta-row">
               <span>Dimensions</span>
-              <span>{dimensions.width}×{dimensions.height}</span>
+              <span>{dimensions.width}{"\u00D7"}{dimensions.height}</span>
             </div>
           </div>
 
@@ -100,3 +100,4 @@ export default function ImagePreview({
     </div>
   );
 }
+

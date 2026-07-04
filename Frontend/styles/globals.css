@@ -741,7 +741,7 @@ p {
 
 .preview-body {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: minmax(320px, 38%) 1fr;
   gap: 0;
 }
 
@@ -818,61 +818,29 @@ p {
     flex-direction: column;
     align-items: flex-start;
   }
-
-  .prediction-box,
-  .top-result,
-  .predictions-list {
-    margin-left: 1rem;
-    margin-right: 1rem;
-  }
-
-  .prediction-row {
-    grid-template-columns: 28px minmax(0, 1fr) 1fr;
-    grid-template-areas:
-      "rank name conf"
-      "rank bar bar";
-    gap: 0.45rem 0.65rem;
-  }
-
-  .pred-rank {
-    grid-area: rank;
-  }
-
-  .pred-name {
-    grid-area: name;
-  }
-
-  .pred-bar-wrap {
-    grid-area: bar;
-  }
-
-  .pred-conf {
-    grid-area: conf;
-    text-align: right;
-  }
 }
 
 .preview-img-wrap {
-  padding: 0.75rem;
+  padding: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  min-height: 200px;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
   border-right: 1px solid rgba(79, 142, 247, 0.1);
 }
 
 .preview-img-wrap img {
-  max-width: 100%;
-  max-height: 350px;
-  object-fit: contain;
-  border-radius: 12px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 18px;
   display: block;
 }
 
 .preview-info {
-  padding: 0.75rem 0.85rem 0.85rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -889,14 +857,15 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.75rem 0.85rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(79, 142, 247, 0.08);
+  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(79, 142, 247, 0.1);
   color: var(--text-2);
-  font-size: 0.84rem;
+  font-size: 0.9rem;
   white-space: nowrap;
   overflow: hidden;
+  box-shadow: 0 8px 20px rgba(17, 17, 17, 0.03);
 }
 
 .meta-row span:first-child {
@@ -956,14 +925,14 @@ p {
 
 .predict-btn {
   border: none;
-  border-radius: 16px;
-  padding: 0.95rem 1rem;
+  border-radius: 18px;
+  padding: 1rem 1rem;
   background: linear-gradient(135deg, var(--accent), #34d399);
   color: white;
-  font-size: 0.92rem;
+  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 16px 28px rgba(79, 142, 247, 0.2);
+  box-shadow: 0 16px 28px rgba(79, 142, 247, 0.22);
   transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
 }
 
@@ -981,7 +950,7 @@ p {
   position: relative;
   width: 100%;
   margin: 2rem 0;
-  border-radius: 26px;
+  border-radius: 28px;
   overflow: hidden;
   border: 2px solid transparent;
   background:
@@ -1001,14 +970,14 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   border-bottom: 1px solid rgba(79, 142, 247, 0.1);
   background: #ffffff;
 }
 
 .results-header h2 {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.12rem;
+  font-weight: 800;
   color: var(--text-1);
 }
 
@@ -1017,120 +986,48 @@ p {
   color: var(--text-3);
 }
 
-.prediction-box {
-  margin: 1rem 1.25rem 1.25rem;
-  padding: 1rem 1.1rem;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 12px rgba(79, 142, 247, 0.25);
+.prediction-hero {
+  margin: 1.25rem;
+  padding: 1.35rem 1.4rem 1.4rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #4f8ef7 0%, #46b9d8 52%, #34d399 100%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 18px 36px rgba(79, 142, 247, 0.22);
 }
 
-.prediction-box-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.prediction-box-name {
-  margin-top: 0.25rem;
-  font-size: 1.35rem;
+.prediction-hero-label {
+  font-size: 0.76rem;
   font-weight: 800;
-  color: #ffffff;
-  line-height: 1.15;
-}
-
-.prediction-box-accuracy {
-  margin-top: 0.35rem;
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.top-result {
-  margin: 0 1.25rem 1rem;
-  padding: 0.95rem 1rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.68);
-  border: 1px solid rgba(79, 142, 247, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.top-result-rank {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  color: rgba(255, 255, 255, 0.8);
 }
 
-.top-result-name {
-  font-weight: 700;
-  color: var(--text-1);
+.prediction-hero-name {
+  margin-top: 0.35rem;
+  font-size: clamp(1.8rem, 2vw, 2.4rem);
+  line-height: 1.05;
+  font-weight: 900;
+  color: #ffffff;
 }
 
-.top-result-conf {
-  margin-left: auto;
-  font-weight: 700;
-  color: var(--text-2);
+.prediction-hero-accuracy {
+  margin-top: 0.65rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
 }
 
-.predictions-list {
-  padding: 0 1.25rem 1.25rem;
+.prediction-hero--warning {
+  background: linear-gradient(135deg, #ff6b6b 0%, #fb7185 52%, #f97316 100%);
 }
 
-.prediction-row {
-  display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) minmax(140px, 1fr) 72px;
-  gap: 0.75rem;
-  align-items: center;
-  padding: 0.7rem 0;
+.prediction-hero-name--warning {
+  font-size: clamp(1.2rem, 1.6vw, 1.7rem);
 }
 
-.pred-rank,
-.pred-conf {
-  font-size: 0.8rem;
-  color: var(--text-3);
-  font-weight: 700;
-}
-
-.pred-name {
-  font-weight: 600;
-  color: var(--text-1);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.pred-bar-wrap {
-  height: 8px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(79, 142, 247, 0.08);
-}
-
-.pred-bar {
-  height: 100%;
-  border-radius: inherit;
-}
-
-.pred-bar.rank-1 {
-  background: linear-gradient(90deg, var(--accent), #34d399);
-}
-
-.pred-bar.rank-2 {
-  background: linear-gradient(90deg, #60a5fa, #34d399);
-}
-
-.pred-bar.rank-3 {
-  background: linear-gradient(90deg, #93c5fd, #86efac);
-}
-
-.pred-bar.rank-other {
-  background: linear-gradient(90deg, rgba(79, 142, 247, 0.45), rgba(52, 211, 153, 0.35));
+.prediction-hero-accuracy--warning {
+  font-size: 0.95rem;
 }
 
 /* ── Stats Row ─────────────────────────────────────── */
