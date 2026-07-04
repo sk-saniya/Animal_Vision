@@ -1,5 +1,11 @@
 
 
+export const config = {
+  api: {
+    maxDuration: 10,
+  },
+};
+
 const BACKEND_URL =
   process.env.BACKEND_URL ||
   process.env.HF_BACKEND_URL ||

@@ -6,7 +6,10 @@ import fs from "fs";
 import fetch from "node-fetch";
 
 export const config = {
-  api: { bodyParser: false },   // must be off for file uploads
+  api: {
+    bodyParser: false,   // must be off for file uploads
+    maxDuration: 60,
+  },
 };
 
 const BACKEND_URL =
