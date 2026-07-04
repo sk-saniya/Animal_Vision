@@ -1,7 +1,7 @@
 // components/PredictionResult.jsx
 import { useEffect, useState } from "react";
 
-export default function PredictionResult({ result, imageSrc, onReset }) {
+export default function PredictionResult({ result }) {
   const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
@@ -20,12 +20,6 @@ export default function PredictionResult({ result, imageSrc, onReset }) {
 
   return (
     <div className="results-card">
-      {imageSrc && (
-        <div className="results-image-wrap">
-          <img src={imageSrc} alt="Prediction preview" className="results-image" />
-        </div>
-      )}
-
       {/* Header */}
       <div className="results-header">
         <h2>Prediction Results</h2>

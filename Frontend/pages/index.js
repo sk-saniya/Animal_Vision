@@ -237,7 +237,7 @@ export default function Home() {
               )}
 
               {result && !loading && (
-                <PredictionResult result={result} imageSrc={previewUrl} onReset={handleClear} />
+                <PredictionResult result={result} />
               )}
             </div>
           </div>
