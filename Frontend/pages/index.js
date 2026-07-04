@@ -54,9 +54,11 @@ export default function Home() {
   const [modelInfo, setModelInfo] = useState(null);
 
   useEffect(() => {
+    console.log("[Animal Vision] Checking backend health:", BACKEND_URL);
     fetch(`${BACKEND_URL}/health`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("[Animal Vision] Backend health OK:", data);
         setBackendOnline(true);
         if (data) {
           setModelInfo({
@@ -90,6 +92,13 @@ export default function Home() {
     setError(null);
     setErrorDetail(null);
     setResult(null);
+    console.log("[Animal Vision] Sending prediction request:", {
+      backendUrl: BACKEND_URL,
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      topK,
+    });
 
     const formData = new FormData();
     formData.append("image", file);
@@ -101,6 +110,11 @@ export default function Home() {
         body: formData,
       });
       const data = await res.json().catch(() => ({}));
+      console.log("[Animal Vision] Predict response:", {
+        status: res.status,
+        ok: res.ok,
+        data,
+      });
 
       if (!res.ok) {
         const message = data?.error || data?.detail || "Prediction failed";
@@ -123,6 +137,7 @@ export default function Home() {
 
       setResult(data);
     } catch (err) {
+      console.error("[Animal Vision] Predict request failed:", err);
       const responseData = err.response?.data;
       const msg = err.message || responseData?.error || "Something went wrong while predicting. Please try again.";
 
