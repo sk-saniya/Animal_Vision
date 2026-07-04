@@ -4,6 +4,10 @@ import UploadZone from "../components/UploadZone";
 import ImagePreview from "../components/ImagePreview";
 import PredictionResult from "../components/PredictionResult";
 
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  "https://sk-saniya-animal-vision-backend.hf.space";
+
 export default function Home() {
   const backgroundAnimals = [
     { name: "Bee", icon: "🐝", className: "bg-animal bg-animal-1" },
@@ -50,11 +54,11 @@ export default function Home() {
   const [modelInfo, setModelInfo] = useState(null);
 
   useEffect(() => {
-    fetch("/api/health")
+    fetch(`${BACKEND_URL}/health`)
       .then((res) => res.json())
       .then((data) => {
-        setBackendOnline(data.online);
-        if (data.online) {
+        setBackendOnline(true);
+        if (data) {
           setModelInfo({
             labels: data.animals_loaded,
             device: data.device,
@@ -92,7 +96,7 @@ export default function Home() {
     formData.append("top_k", topK);
 
     try {
-      const res = await fetch("/api/predict", {
+      const res = await fetch(`${BACKEND_URL}/predict`, {
         method: "POST",
         body: formData,
       });
