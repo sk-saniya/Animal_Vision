@@ -1,13 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://localhost:5000/api/:path*",
-      },
-    ];
+  env: {
+    HF_BACKEND_URL: 'https://sk-saniya-animal-vision-backend.hf.space',
+    NEXT_PUBLIC_HF_BACKEND_URL: 'https://sk-saniya-animal-vision-backend.hf.space',
   },
 };
 

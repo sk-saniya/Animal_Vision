@@ -1,6 +1,10 @@
 
 
-const BACKEND_URL = process.env.BACKEND_URL || process.env.FLASK_URL || "http://localhost:7860";
+const BACKEND_URL =
+  process.env.BACKEND_URL ||
+  process.env.HF_BACKEND_URL ||
+  process.env.FLASK_URL ||
+  "https://sk-saniya-animal-vision-backend.hf.space";
 
 export default async function handler(req, res) {
   try {
