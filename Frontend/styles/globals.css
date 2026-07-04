@@ -745,19 +745,6 @@ p {
   gap: 0;
 }
 
-.preview-card--compact .preview-body {
-  grid-template-columns: 1fr;
-}
-
-.preview-card--compact .preview-info {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
-.preview-card--compact .preview-img-wrap {
-  display: none;
-}
-
 @media (max-width: 640px) {
   .preview-card {
     max-width: 100%;

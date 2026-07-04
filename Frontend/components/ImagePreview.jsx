@@ -10,7 +10,6 @@ export default function ImagePreview({
   onClear,
   loading,
   onFileSelect,
-  hideImage = false,
 }) {
   if (!file) return null;
 
@@ -30,7 +29,7 @@ export default function ImagePreview({
   }, [previewUrl]);
 
   return (
-    <div className={`preview-card ${hideImage ? "preview-card--compact" : ""}`}>
+    <div className="preview-card">
       <div className="preview-header">
         <h3>Selected Image</h3>
         <div className="preview-actions">
@@ -56,11 +55,9 @@ export default function ImagePreview({
       </div>
 
       <div className="preview-body">
-        {!hideImage && (
-          <div className="preview-img-wrap">
-            <img src={previewUrl} alt="Selected animal" />
-          </div>
-        )}
+        <div className="preview-img-wrap">
+          <img src={previewUrl} alt="Selected animal" />
+        </div>
 
         <div className="preview-info">
           <div className="file-meta">

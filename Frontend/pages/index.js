@@ -52,11 +52,6 @@ export default function Home() {
   const [errorDetail, setErrorDetail] = useState(null);
   const [backendOnline, setBackendOnline] = useState(null);
   const [modelInfo, setModelInfo] = useState(null);
-  const hidePreviewImage = Boolean(
-    result &&
-      !result.notAnimal &&
-      (result.predicted_animal || result.predictedAnimal || result.name)
-  );
 
   useEffect(() => {
     console.log("[Animal Vision] Checking backend health:", BACKEND_URL);
@@ -220,7 +215,6 @@ export default function Home() {
                 onClear={handleClear}
                 loading={loading}
                 onFileSelect={handleFileSelect}
-                hideImage={hidePreviewImage}
               />
             </div>
 
