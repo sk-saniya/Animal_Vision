@@ -166,7 +166,7 @@ export default function Home() {
       <Head>
         <title>Animal Vision &middot; CLIP Classifier</title>
         <meta name="description" content="Identify any of 25,000 animal species from a photo using CLIP." />
-        <link rel="icon" type="image/svg+xml" href="/brain-svgrepo-com.svg" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css" />
       </Head>
 
