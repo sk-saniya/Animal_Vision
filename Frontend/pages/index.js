@@ -4,9 +4,7 @@ import UploadZone from "../components/UploadZone";
 import ImagePreview from "../components/ImagePreview";
 import PredictionResult from "../components/PredictionResult";
 
-const BACKEND_URL =
-  process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "https://sk-saniya-animal-vision-backend.hf.space";
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 
 export default function Home() {
   const backgroundAnimals = [
@@ -54,8 +52,9 @@ export default function Home() {
   const [modelInfo, setModelInfo] = useState(null);
 
   useEffect(() => {
-    console.log("[Animal Vision] Checking backend health:", BACKEND_URL);
-    fetch(`${BACKEND_URL}/health`)
+    const healthUrl = BACKEND_URL ? `${BACKEND_URL}/health` : "/api/health";
+    console.log("[Animal Vision] Checking backend health:", BACKEND_URL || "/api/health");
+    fetch(healthUrl)
       .then((res) => res.json())
       .then((data) => {
         console.log("[Animal Vision] Backend health OK:", data);
@@ -98,7 +97,7 @@ export default function Home() {
     setErrorDetail(null);
     setResult(null);
     console.log("[Animal Vision] Sending prediction request:", {
-      backendUrl: BACKEND_URL,
+      backendUrl: BACKEND_URL || "/api/predict",
       fileName: file.name,
       fileSize: file.size,
       fileType: file.type,
@@ -110,7 +109,8 @@ export default function Home() {
     formData.append("top_k", topK);
 
     try {
-      const res = await fetch(`${BACKEND_URL}/predict`, {
+      const predictUrl = BACKEND_URL ? `${BACKEND_URL}/predict` : "/api/predict";
+      const res = await fetch(predictUrl, {
         method: "POST",
         body: formData,
       });
