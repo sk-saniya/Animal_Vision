@@ -91,7 +91,7 @@ export default function ImagePreview({
             ) : (
               <>
                 <i className="ti ti-sparkles" aria-hidden="true"></i>
-                Identify animal
+                Identify Animal
               </>
             )}
           </button>
