@@ -6,7 +6,7 @@ import PredictionResult from "../components/PredictionResult";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ||
-  "";
+  "https://sk-saniya-animal-vision-backend.hf.space";
 
 export default function Home() {
   const backgroundAnimals = [
