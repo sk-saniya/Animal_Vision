@@ -183,21 +183,6 @@ Returns basic health information.
 
 ---
 
-## Contributing
 
-1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/awesome-thing`).
-3. Make your changes, ensure all tests (if any) pass.
-4. Submit a Pull Request with a clear description of the change.
-
-Please adhere to the existing code style and include updated documentation when applicable.
-
----
-
-## License
-
-This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
-
----
 
 *Happy animal hunting!*
