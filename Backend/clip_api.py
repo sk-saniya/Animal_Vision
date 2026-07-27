@@ -3,7 +3,7 @@ import io
 import os
 import re
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 import base64
 from PIL import Image, ImageDraw, ImageFont
 
@@ -397,6 +397,51 @@ def clip_predict_one(img_embedding: torch.Tensor,
 
 
 # ──────────────────────────────────────────────────────────────
+
+def zero_shot_predict(img_embedding: torch.Tensor, text_matrix: torch.Tensor, animal_names: List[str], top_k: int = 10) -> List[Tuple[str, float]]:
+    """Return top‑k CLIP zero‑shot predictions.
+    Args:
+        img_embedding: Normalised CLIP image embedding.
+        text_matrix:   Normalised CLIP text embeddings for all animal names.
+        animal_names:  List of names matching rows of text_matrix.
+        top_k:        Number of top predictions to return.
+    Returns:
+        List of (name, confidence_percent) sorted by confidence descending.
+    """
+    sims = img_embedding @ text_matrix.T
+    probs = F.softmax(sims * 100.0, dim=0)
+    top_vals, top_idx = torch.topk(probs, k=top_k)
+    results = []
+    for idx, val in zip(top_idx.tolist(), top_vals.tolist()):
+        results.append((animal_names[idx], round(val * 100.0, 2)))
+    return results
+
+def combined_predict(
+    img_embedding: torch.Tensor,
+    cnn_predictions: List[Tuple[str, float]],
+    text_matrix: torch.Tensor,
+    animal_names: List[str],
+    idx_to_class: Dict[int, str],
+    top_k: int = 5,
+) -> List[Tuple[str, float]]:
+    """Combine CNN predictions with CLIP zero‑shot results.
+    The function merges the CNN class‑probability list with CLIP zero‑shot
+    predictions, adds the scores together (CNN probabilities are scaled to
+    percentages), and returns the top‑k combined predictions sorted by the
+    combined confidence.
+    """
+    # Get CLIP zero‑shot candidates (use a larger pool for better coverage)
+    clip_results = zero_shot_predict(img_embedding, text_matrix, animal_names, top_k=top_k * 2)
+    combined_scores: Dict[str, float] = {}
+    # Add CNN scores (scale to percentage)
+    for name, prob in cnn_predictions:
+        combined_scores[name] = combined_scores.get(name, 0.0) + prob * 100.0
+    # Add CLIP scores
+    for name, prob in clip_results:
+        combined_scores[name] = combined_scores.get(name, 0.0) + prob
+    # Sort and return top‑k
+    sorted_combined = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
+    return sorted_combined
 # STARTUP  — load data once
 # ──────────────────────────────────────────────────────────────
 animal_names = load_animals_txt(ANIMALS_TXT)
@@ -415,18 +460,35 @@ def index():
         "status"  : "ok",
         "message" : "Animal Classification API is running",
         "endpoints": {
-            "health" : "GET  /health",
-            "predict": "POST /predict",
+            "health"           : "GET  /health",
+            "predict"          : "POST /predict",
+            "predict_multiple" : "GET|POST /predict-multiple",
         },
     })
 
 
 @app.route("/health", methods=["GET"])
 def health():
+    """Health check — reports server status and available prediction capabilities."""
     return jsonify({
-        "status"         : "ok",
-        "animals_loaded" : len(animal_names),
-        "device"         : DEVICE,
+        "status"          : "ok",
+        "animals_loaded"  : len(animal_names),
+        "device"          : DEVICE,
+        "capabilities": {
+            "single_animal": {
+                "endpoint"    : "POST /predict",
+                "description" : "Classify a single animal in an uploaded image using CLIP",
+                "model"       : "CLIP ViT-B/32",
+            },
+            "multiple_animals": {
+                "endpoint"    : "POST /predict-multiple",
+                "description" : "Detect and classify every animal in an image (YOLO + CLIP)",
+                "detector"    : "YOLOv8 (yolov8x-oiv7)",
+                "classifier"  : "CLIP ViT-B/32",
+                "max_species" : len(animal_names),
+                "info"        : "GET /predict-multiple for full request/response schema",
+            },
+        },
     })
 
 
@@ -473,8 +535,52 @@ def predict():
 
 
 
-@app.route("/predict-multiple", methods=["POST"])
+@app.route("/predict-multiple", methods=["GET", "POST"])
 def predict_multiple():
+    # ── GET: return endpoint usage information
+    if request.method == "GET":
+        return jsonify({
+            "endpoint"    : "/predict-multiple",
+            "method"      : "POST",
+            "description" : (
+                "Detect and classify every animal present in a single image. "
+                "Returns bounding boxes, species names, confidence scores, "
+                "cropped thumbnails, and an annotated composite image."
+            ),
+            "request": {
+                "content_type": "multipart/form-data",
+                "fields": {
+                    "image": "(required) Image file — JPEG, PNG, WEBP, etc."
+                }
+            },
+            "response": {
+                "annotated_image": "Base-64 JPEG of the full image with coloured bounding boxes drawn",
+                "detections": [
+                    {
+                        "label"      : "Sequential animal number starting at 1",
+                        "box"        : "[x1, y1, x2, y2] pixel coordinates",
+                        "name"       : "Predicted species name",
+                        "accuracy"   : "Confidence score (0–100)",
+                        "is_animal"  : "True if CLIP confirmed the crop as an animal",
+                        "yolo_class" : "Raw YOLO class label",
+                        "crop_image" : "Base-64 JPEG of the cropped animal region"
+                    }
+                ]
+            },
+            "errors": {
+                "400 No image file provided"    : "'image' field missing from the form-data",
+                "400 Empty filename"            : "File field present but filename is empty",
+                "400 No animals detected"       : "YOLO found no animal objects in the image",
+                "400 Invalid image"             : "The uploaded file could not be decoded as an image",
+                "500 Detection/Prediction failed": "Unexpected server-side error"
+            },
+            "example_curl": (
+                "curl -X POST http://localhost:5000/predict-multiple "
+                "-F 'image=@/path/to/photo.jpg'"
+            )
+        })
+
+    # ── POST: detect + classify all animals in the uploaded image
     if "image" not in request.files:
         return jsonify({"error": "No image file provided"}), 400
 
@@ -483,7 +589,6 @@ def predict_multiple():
         return jsonify({"error": "Empty filename"}), 400
 
     try:
-        import io
         img_bytes = file.read()
         original_img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
     except Exception as e:
@@ -495,28 +600,30 @@ def predict_multiple():
 
         if not kept_detections:
             return jsonify({
-                "error": "No animals detected",
+                "error" : "No animals detected",
                 "detail": "Object detection did not find any animal objects in this image.",
             }), 400
 
         # Classify each detected animal crop using CLIP
-        font = _get_font(20)
+        font           = _get_font(20)
         final_detections = []
-        annotated_img = original_img.copy()
-        draw = ImageDraw.Draw(annotated_img)
+        annotated_img  = original_img.copy()
+        draw           = ImageDraw.Draw(annotated_img)
 
         for i, det in enumerate(kept_detections, start=1):
             x1, y1, x2, y2 = det["box"]
             color = COLORS[(i - 1) % len(COLORS)]
 
             # Crop with padding
-            pad_x = max(int((x2 - x1) * 0.05), 6)
-            pad_y = max(int((y2 - y1) * 0.05), 6)
-            x1c, y1c = max(0, x1 - pad_x), max(0, y1 - pad_y)
-            x2c, y2c = min(W, x2 + pad_x), min(H, y2 + pad_y)
-            crop = original_img.crop((x1c, y1c, x2c, y2c))
+            pad_x  = max(int((x2 - x1) * 0.05), 6)
+            pad_y  = max(int((y2 - y1) * 0.05), 6)
+            x1c    = max(0, x1 - pad_x)
+            y1c    = max(0, y1 - pad_y)
+            x2c    = min(W, x2 + pad_x)
+            y2c    = min(H, y2 + pad_y)
+            crop   = original_img.crop((x1c, y1c, x2c, y2c))
 
-            crop_embedding = encode_image(crop)
+            crop_embedding               = encode_image(crop)
             is_anim, animal_score, reason = is_animal_image(crop_embedding)
 
             if not is_anim:
@@ -524,14 +631,18 @@ def predict_multiple():
             else:
                 name, accuracy = clip_predict_one(crop_embedding, text_matrix, animal_names)
 
-            # Convert crop to base64
+            # Encode crop to base64 for the response
             crop_buffer = io.BytesIO()
             crop.save(crop_buffer, format="JPEG", quality=90)
             crop_base64 = base64.b64encode(crop_buffer.getvalue()).decode("utf-8")
 
-            # Draw box on annotated image
-            label_name = name if name else "Rejected"
-            display_text = f"#{i} {label_name} ({accuracy:.1f}%)" if name else f"#{i} Not Animal"
+            # Draw labelled bounding box on the annotated image
+            label_name   = name if name else "Unknown"
+            display_text = (
+                f"#{i} {label_name} ({accuracy:.1f}%)"
+                if is_anim else
+                f"#{i} Not Animal"
+            )
 
             draw.rectangle([x1, y1, x2, y2], outline=color, width=4)
             tw, th = _text_size(draw, display_text, font)
@@ -542,22 +653,25 @@ def predict_multiple():
             draw.text((x1 + 5, ly + 3), display_text, fill="white", font=font)
 
             final_detections.append({
-                "label": i,
-                "box": det["box"],
-                "name": label_name,
-                "accuracy": accuracy,
-                "is_animal": is_anim,
-                "crop_image": f"data:image/jpeg;base64,{crop_base64}"
+                "label"      : i,
+                "box"        : det["box"],
+                "name"       : label_name,
+                "accuracy"   : round(accuracy, 2),
+                "is_animal"  : is_anim,
+                "yolo_class" : det["yolo_class"],
+                "crop_image" : f"data:image/jpeg;base64,{crop_base64}",
             })
 
-        # Convert annotated image to base64
+        # Encode full annotated image to base64
         ann_buffer = io.BytesIO()
         annotated_img.save(ann_buffer, format="JPEG", quality=90)
         ann_base64 = base64.b64encode(ann_buffer.getvalue()).decode("utf-8")
 
         return jsonify({
+            "total_animals"  : len([d for d in final_detections if d["is_animal"]]),
+            "total_detected" : len(final_detections),
             "annotated_image": f"data:image/jpeg;base64,{ann_base64}",
-            "detections": final_detections
+            "detections"     : final_detections,
         })
 
     except Exception as e:
@@ -568,8 +682,11 @@ def predict_multiple():
 # RUN
 # ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 7860))
+    port = int(os.environ.get("PORT", 5000))
     print("\n[clip_api] Endpoints:")
-    print(f"  GET  http://localhost:{port}/health")
-    print(f"  POST http://localhost:{port}/predict\n")
+    print(f"  GET  http://localhost:{port}/")
+    print(f"  GET  http://localhost:{port}/health              ← server status & capabilities")
+    print(f"  POST http://localhost:{port}/predict             ← single-animal classification")
+    print(f"  GET  http://localhost:{port}/predict-multiple    ← multi-animal API usage info")
+    print(f"  POST http://localhost:{port}/predict-multiple    ← detect & classify all animals\n")
     app.run(host="0.0.0.0", port=port, debug=False)

@@ -1,34 +1,30 @@
-FROM python:3.9-slim
+# ──────────────────────────────────────────────
+# Dockerfile — Animal Vision Backend (Render)
+# ──────────────────────────────────────────────
 
-# Install git for CLIP
+FROM python:3.10-slim
+
+# System dependencies (git needed for CLIP install)
 RUN apt-get update && apt-get install -y \
     git \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /code
+WORKDIR /app
 
-# Pre-install CPU-only PyTorch to prevent build OOMs and speed up build
+# Install CPU-only PyTorch first (avoids OOM during build)
 RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
-# Copy requirements and install the rest
-COPY requirements.txt /code/requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+# Install remaining dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install flask, flask-cors, and openai-clip
-RUN pip install --no-cache-dir flask flask-cors
-RUN pip install --no-cache-dir git+https://github.com/openai/CLIP.git
+# Copy all backend files
+COPY . .
 
-# Set up non-root user for Hugging Face Spaces (user ID 1000)
-RUN useradd -m -u 1000 user
-USER user
-ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH
-
-WORKDIR $HOME/app
-
-# Copy application files (with ownership set to user)
-COPY --chown=user . $HOME/app
-
-EXPOSE 7860
+# Render uses the PORT environment variable
+ENV PORT=5000
+EXPOSE 5000
 
 CMD ["python", "clip_api.py"]

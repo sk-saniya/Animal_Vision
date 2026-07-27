@@ -43,6 +43,7 @@ export default function Home() {
 
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [imageMode, setImageMode] = useState("single");
   const [topK, setTopK] = useState(5);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -96,8 +97,11 @@ export default function Home() {
     setError(null);
     setErrorDetail(null);
     setResult(null);
+    const isMultiple = imageMode === "multiple";
     console.log("[Animal Vision] Sending prediction request:", {
-      backendUrl: BACKEND_URL || "/api/predict",
+      backendUrl: isMultiple
+        ? (BACKEND_URL ? `${BACKEND_URL}/predict-multiple` : "/api/predict-multiple")
+        : (BACKEND_URL ? `${BACKEND_URL}/predict` : "/api/predict"),
       fileName: file.name,
       fileSize: file.size,
       fileType: file.type,
@@ -109,7 +113,9 @@ export default function Home() {
     formData.append("top_k", topK);
 
     try {
-      const predictUrl = BACKEND_URL ? `${BACKEND_URL}/predict` : "/api/predict";
+      const predictUrl = isMultiple
+        ? (BACKEND_URL ? `${BACKEND_URL}/predict-multiple` : "/api/predict-multiple")
+        : (BACKEND_URL ? `${BACKEND_URL}/predict` : "/api/predict");
       const res = await fetch(predictUrl, {
         method: "POST",
         body: formData,
@@ -140,19 +146,34 @@ export default function Home() {
         };
       }
 
+      if (isMultiple && Array.isArray(data?.detections) && data.detections.length === 1) {
+        setResult({
+          singleAnimalImage: true,
+          message: "This image contains only one animal. Please use Single Animal Image mode for this upload.",
+        });
+        return;
+      }
+
       setResult(data);
     } catch (err) {
-      console.error("[Animal Vision] Predict request failed:", err);
       const responseData = err.response?.data;
       const msg = err.message || responseData?.error || "Something went wrong while predicting. Please try again.";
 
-      if (msg.toLowerCase().includes("not an animal")) {
+      if (msg.toLowerCase().includes("not an animal") || msg.toLowerCase().includes("no animals detected")) {
+        console.warn("[Animal Vision] Prediction rejected:", responseData?.detail || msg);
         setResult({
           notAnimal: true,
           message: responseData?.detail || msg,
           animalScore: responseData?.animal_score,
         });
+      } else if (msg.toLowerCase().includes("multiple animals detected")) {
+        console.warn("[Animal Vision] Prediction rejected:", responseData?.detail || msg);
+        setResult({
+          multipleAnimals: true,
+          message: responseData?.detail || msg,
+        });
       } else {
+        console.error("[Animal Vision] Predict request failed:", err);
         setError(msg);
         setErrorDetail(err.detail || responseData?.detail || null);
       }
@@ -166,7 +187,6 @@ export default function Home() {
       <Head>
         <title>Animal Vision &middot; CLIP Classifier</title>
         <meta name="description" content="Identify any of 25,000 animal species from a photo using CLIP." />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css" />
       </Head>
 
       <div className="background-animals" aria-hidden="true">
@@ -202,7 +222,7 @@ export default function Home() {
         </div>
 
         {!file ? (
-          <UploadZone onFileSelect={handleFileSelect} />
+          <UploadZone onFileSelect={handleFileSelect} imageMode={imageMode} setImageMode={setImageMode} />
         ) : (
           <div className="side-by-side">
             <div className="side-left">
@@ -215,6 +235,7 @@ export default function Home() {
                 onClear={handleClear}
                 loading={loading}
                 onFileSelect={handleFileSelect}
+                imageMode={imageMode}
               />
             </div>
 
@@ -237,7 +258,7 @@ export default function Home() {
               )}
 
               {result && !loading && (
-                <PredictionResult result={result} />
+                <PredictionResult result={result} imageMode={imageMode} />
               )}
             </div>
           </div>

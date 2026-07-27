@@ -6,6 +6,10 @@ export default function Document() {
       <Head>
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.svg" />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css"
+        />
       </Head>
       <body>
         <Main />

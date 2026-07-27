@@ -25,7 +25,6 @@ export default async function handler(req, res) {
   const [fields, files] = await form.parse(req);
 
   const file = Array.isArray(files.image) ? files.image[0] : files.image;
-  const top_k = Array.isArray(fields.top_k) ? fields.top_k[0] : fields.top_k || "5";
 
   if (!file) {
     return res.status(400).json({ error: "No image file provided" });
@@ -36,10 +35,9 @@ export default async function handler(req, res) {
     filename: file.originalFilename || "upload.jpg",
     contentType: file.mimetype || "image/jpeg",
   });
-  formData.append("top_k", top_k);
 
   try {
-    const response = await fetch(`${BACKEND_URL}/predict`, {
+    const response = await fetch(`${BACKEND_URL}/predict-multiple`, {
       method: "POST",
       body: formData,
       headers: formData.getHeaders(),

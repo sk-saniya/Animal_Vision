@@ -1,27 +1,25 @@
-""""#requirements.txt
+# ──────────────────────────────────────────────
+# requirements.txt — Animal Vision Backend
+# ──────────────────────────────────────────────
+
+# Core ML
 torch>=2.0.0
 torchvision>=0.15.0
-tqdm>=4.65.0
+
+# Image handling
 Pillow>=9.0.0
+
+# Utilities
+tqdm>=4.65.0
 ftfy>=6.1.0
 regex>=2023.0.0
 
-# OpenAI CLIP — install directly from GitHub (not on PyPI)
-# Run this separately:
- git+https://github.com/openai/CLIP.git
- """"'
+# Web framework
+flask>=2.3.0
+flask-cors>=4.0.0
 
-# ──────────────────────────────────────────────
-# requirements.txt
-# Animal Classification — CNN + CLIP (Option 2)
-# ──────────────────────────────────────────────
+# YOLO
+ultralytics>=8.0.0
 
-torch>=2.0.0
-torchvision>=0.15.0
-tqdm>=4.65.0
-Pillow>=9.0.0
-ftfy>=6.1.0
-regex>=2023.0.0
-
-# ⚠️  OpenAI CLIP is NOT on PyPI — install separately:
- git+https://github.com/openai/CLIP.git
+# OpenAI CLIP (not on PyPI — installed via git)
+git+https://github.com/openai/CLIP.git

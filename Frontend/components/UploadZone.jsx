@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp", "image/bmp"];
 
-export default function UploadZone({ onFileSelect }) {
+export default function UploadZone({ onFileSelect, imageMode, setImageMode }) {
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef(null);
 
@@ -25,25 +25,35 @@ export default function UploadZone({ onFileSelect }) {
 
   return (
     <div className="upload-section">
-      <label
-        className={`upload-zone ${dragOver ? "drag-over" : ""}`}
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp,image/bmp"
-          onChange={(e) => handleFiles(e.target.files)}
-        />
-        <div className="upload-icon">
-          <i className="ti ti-photo-up" aria-hidden="true"></i>
-        </div>
-        <div className="upload-label">Drop an animal photo here</div>
-        <div className="upload-sub">or click to browse your files</div>
-        <div className="upload-hint">Supports JPG, PNG, WEBP, BMP &middot; up to 10MB</div>
-      </label>
+      <div className="upload-mode-actions" aria-label="Choose image upload mode">
+        <button
+          type="button"
+          className={`upload-mode-btn ${imageMode === "single" ? "active" : ""}`}
+          onClick={() => {
+            setImageMode("single");
+            inputRef.current?.click();
+          }}
+        >
+          Single Animal Image
+        </button>
+        <button
+          type="button"
+          className={`upload-mode-btn ${imageMode === "multiple" ? "active" : ""}`}
+          onClick={() => {
+            setImageMode("multiple");
+            inputRef.current?.click();
+          }}
+        >
+          Multiple Animal Image
+        </button>
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        style={{ display: "none" }}
+        accept="image/jpeg,image/png,image/webp,image/bmp"
+        onChange={(e) => handleFiles(e.target.files)}
+      />
     </div>
   );
 }

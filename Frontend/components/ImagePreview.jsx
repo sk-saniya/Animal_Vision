@@ -10,23 +10,32 @@ export default function ImagePreview({
   onClear,
   loading,
   onFileSelect,
+  imageMode,
 }) {
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (!previewUrl) {
+      setDimensions({ width: 0, height: 0 });
+      return;
+    }
+
+    const img = new Image();
+    img.onload = () => {
+      setDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.onerror = () => {
+      setDimensions({ width: 0, height: 0 });
+    };
+    img.src = previewUrl;
+  }, [previewUrl]);
+
   if (!file) return null;
 
   const sizeKB = (file.size / 1024).toFixed(1);
   const sizeDisplay = file.size > 1024 * 1024
     ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
     : `${sizeKB} KB`;
-
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    const img = new Image();
-    img.src = previewUrl;
-    img.onload = () => {
-      setDimensions({ width: img.naturalWidth, height: img.naturalHeight });
-    };
-  }, [previewUrl]);
 
   return (
     <div className="preview-card">
@@ -56,7 +65,11 @@ export default function ImagePreview({
 
       <div className="preview-body">
         <div className="preview-img-wrap">
-          <img src={previewUrl} alt="Selected animal" />
+          {previewUrl ? (
+            <img src={previewUrl} alt="Selected animal" />
+          ) : (
+            <div className="preview-img-placeholder">Loading preview...</div>
+          )}
         </div>
 
         <div className="preview-info">
@@ -91,7 +104,7 @@ export default function ImagePreview({
             ) : (
               <>
                 <i className="ti ti-sparkles" aria-hidden="true"></i>
-                Identify Animal
+                {imageMode === "multiple" ? "Identify Animals" : "Identify Animal"}
               </>
             )}
           </button>
