@@ -18,6 +18,9 @@ regex>=2023.0.0
 flask>=2.3.0
 flask-cors>=4.0.0
 
+
+gunicorn>=21.0.0
+
 # YOLO
 ultralytics>=8.0.0
 
