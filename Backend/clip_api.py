@@ -685,7 +685,7 @@ def predict_multiple():
 # RUN
 # ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8000))
     print("\n[clip_api] Endpoints:")
     print(f"  GET  http://localhost:{port}/")
     print(f"  GET  http://localhost:{port}/health              ← server status & capabilities")
