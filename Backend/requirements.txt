@@ -2,9 +2,9 @@
 # requirements.txt — Animal Vision Backend
 # ──────────────────────────────────────────────
 
-# Core ML
-torch>=2.0.0
-torchvision>=0.15.0
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
 
 # Image handling
 Pillow>=9.0.0
@@ -17,6 +17,7 @@ regex>=2023.0.0
 # Web framework
 flask>=2.3.0
 flask-cors>=4.0.0
+gunicorn>=21.0.0
 
 
 gunicorn>=21.0.0
