@@ -2,9 +2,9 @@
 # requirements.txt — Animal Vision Backend
 # ──────────────────────────────────────────────
 
---extra-index-url https://download.pytorch.org/whl/cpu
-torch
-torchvision
+# Core ML
+torch>=2.0.0
+torchvision>=0.15.0
 
 # Image handling
 Pillow>=9.0.0
@@ -17,13 +17,9 @@ regex>=2023.0.0
 # Web framework
 flask>=2.3.0
 flask-cors>=4.0.0
-gunicorn>=21.0.0
-
-
-gunicorn>=21.0.0
 
 # YOLO
 ultralytics>=8.0.0
 
 # OpenAI CLIP (not on PyPI — installed via git)
-clip @ git+https://github.com/openai/CLIP.git
+git+https://github.com/openai/CLIP.git

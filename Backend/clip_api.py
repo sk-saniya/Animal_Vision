@@ -1,8 +1,6 @@
-import os
-os.environ["OMP_NUM_THREADS"] = "1"
-os.environ["MKL_NUM_THREADS"] = "1"
 
 import io
+import os
 import re
 from pathlib import Path
 from typing import List, Tuple, Dict
@@ -10,7 +8,6 @@ import base64
 from PIL import Image, ImageDraw, ImageFont
 
 import torch
-torch.set_num_threads(1)
 import torch.nn.functional as F
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -28,7 +25,7 @@ COLORS = [
     "#FFAA44", "#44AAFF", "#FF44CC", "#CCFF44",
 ]
 
-YOLO_MODEL = "yolov8n.pt"
+YOLO_MODEL = "yolov8x-oiv7.pt"
 YOLO_CONF = 0.10
 YOLO_IOU = 0.45
 YOLO_IMGSZ = 1280
@@ -685,7 +682,7 @@ def predict_multiple():
 # RUN
 # ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 5000))
     print("\n[clip_api] Endpoints:")
     print(f"  GET  http://localhost:{port}/")
     print(f"  GET  http://localhost:{port}/health              ← server status & capabilities")
