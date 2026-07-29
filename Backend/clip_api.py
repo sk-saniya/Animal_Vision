@@ -442,6 +442,8 @@ def combined_predict(
     # Sort and return top‑k
     sorted_combined = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
     return sorted_combined
+
+# ──────────────────────────────────────────────────────────────
 # STARTUP  — load data once
 # ──────────────────────────────────────────────────────────────
 animal_names = load_animals_txt(ANIMALS_TXT)
